@@ -9,14 +9,16 @@
 #include <stdio.h>
 #include <GL/glut.h>
 
+#include "glhelper.hpp"
+
 static void 	draw_body(b2Body * body)
 {
 	float angle = body->GetAngle() * RADTODEG;
 
-	glPushMatrix();
+	glMatrixKeeper m;
 
 	glTranslatef(body->GetPosition().x,body->GetPosition().y,0.0);
-	glRotated(angle,0,0,-1);
+	glRotated(angle,0,0,1);
 
 	for(b2Fixture * fixtures = body->GetFixtureList();fixtures;fixtures = fixtures->GetNext())
 	{
@@ -25,23 +27,30 @@ static void 	draw_body(b2Body * body)
 		switch (shape->GetType())
 		{
 			case b2Shape::Type::e_polygon:
-			{
-				b2PolygonShape * pshape = ((b2PolygonShape*)shape);
-
-				glBegin(GL_POLYGON);
-				for(int i=0; i < pshape->GetVertexCount(); i ++)
 				{
-					b2Vec2 v = pshape->GetVertex(i);
-					glVertex2f(v.x,v.y);
+					b2PolygonShape * pshape = ((typeof(pshape))shape);
+
+					glBegin(GL_POLYGON);
+					for(int i=0; i < pshape->GetVertexCount(); i ++)
+					{
+						b2Vec2 v = pshape->GetVertex(i);
+						glVertex2f(v.x,v.y);
+					}
+					glEnd();
 				}
-				glEnd();
-			}
-			break;
+				break;
+			case b2Shape::Type::e_circle:
+				{
+					glMatrixKeeper m;
+					b2CircleShape * cshape = (typeof(cshape))shape;
+					glTranslatef(cshape->m_p.x,cshape->m_p.y,100);
+					glutSolidTorus(cshape->m_radius/2,cshape->m_radius/2/*cshape->m_radius*/,256,256);
+				}
+				break;
 			default:
 				break;
 		}
 	}
-	glPopMatrix();
 }
 
 void view_draw_frame(b2World & world)
@@ -55,6 +64,7 @@ void view_draw_frame(b2World & world)
 		draw_body(body);
 	}
 	
+
 	glutSwapBuffers();
 }
 
@@ -62,7 +72,7 @@ static void on_window_resize(int w , int h)
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(-w/80.0,w/80.0, -1,h/40.0 - 1);
+	glOrtho(-w/80.0,w/80.0, -1,h/40.0 - 1,-1000,10000);
 	glMatrixMode(GL_MODELVIEW);
 	glViewport(0,0,w,h);
 	return ;

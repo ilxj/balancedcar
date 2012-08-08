@@ -41,8 +41,6 @@ int		hal_get_speed(void);
  */
 void	hal_delay(int ms);
 
-void	hal_set_angle(int);
-
 /*
  * hal_set_pwm
  *

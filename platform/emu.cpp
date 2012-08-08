@@ -36,12 +36,8 @@ static void simulate_init()
 	car = world.CreateBody(&cardef);
 
 
-	b2CircleShape	carwheel;
 	b2PolygonShape carshape;
 	b2FixtureDef   carfixturedef;
-	carwheel.m_p.Set(0.5,1);
-	carwheel.m_radius = 2*PI;
-
 
 	carshape.SetAsBox(0.5,2);
 	car->CreateFixture(&carshape,0);
@@ -49,19 +45,17 @@ static void simulate_init()
 	carfixturedef.shape = & carshape;
 	carfixturedef.density = 1.0f;
 	carfixturedef.friction = 0.4f;
-	carfixturedef.restitution = 1;
 
 	car->CreateFixture(&carfixturedef);
 
-//	car->CreateFixture(&carwheel,1);
+	carshape.SetAsBox(2,0.5,b2Vec2(-1,0),0);
+	car->CreateFixture(&carfixturedef);
 
-	b2PolygonShape carshape2;
-	carshape2.SetAsBox(2,0.5);
+	b2CircleShape	carwheel;
+	carwheel.m_p.Set(0.0,1);
+	carwheel.m_radius = 2;
 
-//	carshape.SetAsBox(0.5,2);
-
-	carfixturedef.shape = & carshape2;
-
+	carfixturedef.shape = & carwheel;
 	car->CreateFixture(&carfixturedef);
 
 }
@@ -84,9 +78,7 @@ static void simulat_step(int unused)
 
 	long double deltime = (curtime.tv_sec- pretime.tv_sec) + (curtime.tv_nsec- pretime.tv_nsec)/1000000000.0;
 
-//	for(int percise_boost=0;percise_boost < 10;percise_boost++)
-	int percise_boost =1;
-		world.Step(deltime /percise_boost,100,50);
+	world.Step(deltime ,1000,500);
 
 	pretime = curtime;
 }
@@ -122,27 +114,23 @@ int main(int argc,char*argv[])
 
 EXTERN int hal_get_angle_speed(void)
 {
-
+	return car->GetAngularVelocity() * 1000;
 }
 
 EXTERN int hal_get_angle_accel()
 {
-
+	return  car->GetAngularDamping() * 1000;
 }
 
-EXTERN void hal_set_angle(int _angle)
-{
 
+EXTERN int hal_get_speed()
+{
+	return car->GetLinearVelocity().y*100;
 }
 
 EXTERN void hal_set_pwm(int pwm)
 {
 	PWM = pwm;
-}
-
-EXTERN int hal_get_speed()
-{
-
 }
 
 EXTERN void hal_delay(int ms)
