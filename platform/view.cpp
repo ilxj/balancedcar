@@ -58,6 +58,16 @@ void view_draw_frame(b2World & world)
 	glutSwapBuffers();
 }
 
+static void on_window_resize(int w , int h)
+{
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(-w/80.0,w/80.0, -1,h/40.0 - 1);
+	glMatrixMode(GL_MODELVIEW);
+	glViewport(0,0,w,h);
+	return ;
+}
+
 void view_init()
 {
 	glutInitDisplayMode(GLUT_DOUBLE|GLUT_MULTISAMPLE);
@@ -67,7 +77,8 @@ void view_init()
 
 	glEnable(GL_MULTISAMPLE);
 	glMatrixMode(GL_PROJECTION);
-	glOrtho(-10,10,-1,14,-1,1);
+	gluOrtho2D(-10,10,-1,14);
 	glMatrixMode(GL_MODELVIEW);
-}
 
+	glutReshapeFunc(on_window_resize);
+}

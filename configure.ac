@@ -44,6 +44,9 @@ AS_IF([ test "x$platform"="xemu"],
 	
 	dnl ----------------------
 	AC_CHECK_LIB(glut,glutInit,)
+	AC_CHECK_LIB(GLU,gluOrtho2D,)
+	AC_CHECK_LIB(GL,glVertex2f,)
+
 	AC_CHECK_LIB(Box2D,main,)
 	AC_CHECK_LIB(rt,clock_gettime,)
 ])
