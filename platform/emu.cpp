@@ -27,11 +27,19 @@ static void simulate_init()
 
 	b2PolygonShape landshape;
 	landshape.SetAsBox(100,1);
-	land->CreateFixture(&landshape,1);
+
+	GLfloat	* bgcolor = new GLfloat[3];
+
+	bgcolor[0] = 0.0f;
+	bgcolor[1] = 1.0f;
+	bgcolor[2] = 0.0f;
+
+
+	land->CreateFixture(&landshape,1)->SetUserData( bgcolor );
 
 	cardef.type = b2_dynamicBody;
 	cardef.position = b2Vec2(0,2.5);
-	cardef.angle = -44*DEGTORAD;
+	cardef.angle = -1*DEGTORAD;
 
 	car = world.CreateBody(&cardef);
 
@@ -44,20 +52,18 @@ static void simulate_init()
 
 	carfixturedef.shape = & carshape;
 	carfixturedef.density = 1.0f;
-	carfixturedef.friction = 0.4f;
+	carfixturedef.friction = 1.0f;
 
-	car->CreateFixture(&carfixturedef);
-
-	carshape.SetAsBox(2,0.5,b2Vec2(-1,0),0);
 	car->CreateFixture(&carfixturedef);
 
 	b2CircleShape	carwheel;
-	carwheel.m_p.Set(0.0,1);
-	carwheel.m_radius = 2;
+	carwheel.m_p.Set(0.0,-2);
+	carwheel.m_radius = 0.55;
+	carfixturedef.friction = 0.05f;
+
 
 	carfixturedef.shape = & carwheel;
 	car->CreateFixture(&carfixturedef);
-
 }
 
 static void simulat_step(int unused)

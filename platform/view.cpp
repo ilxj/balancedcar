@@ -24,10 +24,18 @@ static void 	draw_body(b2Body * body)
 	{
 		b2Shape * shape = fixtures->GetShape();
 
+		if(fixtures->GetUserData())
+		{
+			glColor3fv(static_cast<GLfloat*>(fixtures->GetUserData()));
+		}else
+			glColor3f(1,1,1);
+
 		switch (shape->GetType())
 		{
 			case b2Shape::Type::e_polygon:
 				{
+					glMatrixKeeper m;
+
 					b2PolygonShape * pshape = ((typeof(pshape))shape);
 
 					glBegin(GL_POLYGON);
@@ -44,7 +52,7 @@ static void 	draw_body(b2Body * body)
 					glMatrixKeeper m;
 					b2CircleShape * cshape = (typeof(cshape))shape;
 					glTranslatef(cshape->m_p.x,cshape->m_p.y,100);
-					glutSolidTorus(cshape->m_radius/2,cshape->m_radius/2/*cshape->m_radius*/,256,256);
+					glutSolidSphere(cshape->m_radius,/*cshape->m_radius*/40,20);
 				}
 				break;
 			default:
