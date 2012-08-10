@@ -11,6 +11,7 @@
 #include <GL/glut.h>
 
 #include "glhelper.hpp"
+#include "emu.hpp"
 
 static void 	draw_body(b2Body * body)
 {
@@ -52,7 +53,7 @@ static void 	draw_body(b2Body * body)
 				{
 					glMatrixKeeper m;
 					b2CircleShape * cshape = (typeof(cshape))shape;
-					glTranslatef(cshape->m_p.x,cshape->m_p.y,100);
+					glTranslatef(cshape->m_p.x,cshape->m_p.y,0);
 					glutSolidSphere(cshape->m_radius,/*cshape->m_radius*/40,20);
 				}
 				break;
@@ -73,18 +74,63 @@ void view_draw_frame(b2World & world)
 		draw_body(body);
 	}
 	
+	// draw arrow to reflect the PWM settings
+	if(hal_get_pwm()!=0)
+	{
+		glMatrixKeeper mk(emulation_get_car()->GetWorldPoint(b2Vec2(0,-2)));
+
+		glColorKeeper ck;
+
+		int s;
+
+		float scale=10;
+
+		s = 6;
+
+		if(hal_get_pwm()<0)
+			s = -s;
+
+		glScaled(1/scale,1/scale,1);
+
+		glBegin(GL_LINES);
+
+		glColor3f(0,1,1);
+
+		glVertex2f(0,0);
+		glVertex2f(-hal_get_pwm(),0);
+
+		glVertex2f(-hal_get_pwm(),0);
+		glVertex2f(-hal_get_pwm() + s,fabs(s));
+
+		glVertex2f(-hal_get_pwm(),0);
+		glVertex2f(-hal_get_pwm() + s,-fabs(s));
+
+		glEnd();
+	}
+
+
 	glutSwapBuffers();
 }
 
-static void on_window_resize(int w , int h)
+static float scale = 20;
+static float w=800,h=600;
+static float centor;
+
+static void update_glview()
 {
-	float scale = 20;
+	printf("scale=%f\n",scale);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-w/scale,w/scale, -1,h*2/scale - 1,-1000,10000);
+	glOrtho(-w/scale -centor ,w/scale -centor, -1,h*2/scale - 1,-1000,10000);
 	glMatrixMode(GL_MODELVIEW);
 	glViewport(0,0,w,h);
-	return ;
+}
+
+static void on_window_resize(int _w , int _h)
+{
+	w = _w;
+	h = _h;
+	update_glview();
 }
 
 static void on_mouse_event(int, int, int, int)
@@ -102,10 +148,20 @@ static void on_key_event( int key, int, int )
 	switch (key)
 	{
 		case GLUT_KEY_LEFT:
-			hal_set_pwm(255);
+			centor +=1;
+			update_glview();
 			break;
 		case GLUT_KEY_RIGHT:
-			hal_set_pwm(-255);
+			centor -=1;
+			update_glview();
+			break;
+		case GLUT_KEY_UP:
+			scale /=2;
+			update_glview();
+			break;
+		case GLUT_KEY_DOWN:
+			scale *=2;
+			update_glview();
 			break;
 		default:
 			break;

@@ -48,6 +48,13 @@ void	hal_delay(int ms);
  */
 void	hal_set_pwm(int pwm);
 
+/*
+ * hal_get_pwm
+ *
+ * get current pwm settings
+ */
+EXTERN int hal_get_pwm();
+
 #ifdef __cplusplus
 }
 #endif
