@@ -3,6 +3,7 @@
  */
 
 #include "constant.h"
+#include "hal.h"
 #include "view.hpp"
 
 #include <unistd.h>
@@ -72,18 +73,43 @@ void view_draw_frame(b2World & world)
 		draw_body(body);
 	}
 	
-
 	glutSwapBuffers();
 }
 
 static void on_window_resize(int w , int h)
 {
+	float scale = 20;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-w/80.0,w/80.0, -1,h/40.0 - 1,-1000,10000);
+	glOrtho(-w/scale,w/scale, -1,h*2/scale - 1,-1000,10000);
 	glMatrixMode(GL_MODELVIEW);
 	glViewport(0,0,w,h);
 	return ;
+}
+
+static void on_mouse_event(int, int, int, int)
+{
+	printf("%s\n",__func__);
+}
+
+static void on_keyup_event( int key, int, int )
+{
+	hal_set_pwm(0);
+}
+
+static void on_key_event( int key, int, int )
+{
+	switch (key)
+	{
+		case GLUT_KEY_LEFT:
+			hal_set_pwm(255);
+			break;
+		case GLUT_KEY_RIGHT:
+			hal_set_pwm(-255);
+			break;
+		default:
+			break;
+	}
 }
 
 void view_init()
@@ -99,4 +125,8 @@ void view_init()
 	glMatrixMode(GL_MODELVIEW);
 
 	glutReshapeFunc(on_window_resize);
+
+	glutMouseFunc(on_mouse_event);
+	glutSpecialFunc(on_key_event);
+	glutSpecialUpFunc(on_keyup_event);
 }

@@ -8,8 +8,13 @@
 #include <unistd.h>
 #include <time.h>
 #include <stdio.h>
+#include <math.h>
 #include <GL/glut.h>
 #include <Box2D/Box2D.h>
+
+#define MAX_SPEED	20.0
+#define MAX_FORCE	5.0
+
 
 b2Vec2	gravity(0,-9.8f);
 b2World	world(gravity,false);
@@ -39,7 +44,7 @@ static void simulate_init()
 
 	cardef.type = b2_dynamicBody;
 	cardef.position = b2Vec2(0,2.5);
-	cardef.angle = -1*DEGTORAD;
+	cardef.angle = -10*DEGTORAD;
 
 	car = world.CreateBody(&cardef);
 
@@ -51,19 +56,61 @@ static void simulate_init()
 	car->CreateFixture(&carshape,0);
 
 	carfixturedef.shape = & carshape;
-	carfixturedef.density = 1.0f;
+	carfixturedef.density = 0.1f;
 	carfixturedef.friction = 1.0f;
 
 	car->CreateFixture(&carfixturedef);
 
 	b2CircleShape	carwheel;
-	carwheel.m_p.Set(0.0,-2);
+	carwheel.m_p = b2Vec2(0.0,-2);
 	carwheel.m_radius = 0.55;
 	carfixturedef.friction = 0.05f;
 
 
 	carfixturedef.shape = & carwheel;
 	car->CreateFixture(&carfixturedef);
+}
+
+static float	simulate_car_wheel_speed()
+{
+	return - car->GetLinearVelocityFromLocalPoint(b2Vec2(0,-2)).x;
+}
+
+static b2Vec2 simulate_caculate_impulse(double deltime)
+{
+	float speed_precent;
+	float force_precent;
+
+	b2Vec2 impulse(0,0);
+
+	/* Get Wheel Speed  */
+	float wheel_speed = simulate_car_wheel_speed();
+
+	/*the theoretical speed indicatied by pwm*/
+	float pwm_speed	= MAX_SPEED* PWM/255.0;
+
+	/* Caculate the Force at given speed  */
+	if(PWM!=0)
+	{
+		speed_precent = (pwm_speed - wheel_speed)/pwm_speed;
+
+		if(speed_precent >= 1)
+			speed_precent = 1;
+		else if(speed_precent <0)
+			return impulse;
+
+		force_precent = speed_precent;//*speed_precent;
+
+		float Impulse = force_precent * MAX_FORCE * PWM / 255.0 * deltime;
+
+#if 0
+		impulse.Set(-Impulse * cos(car->GetAngle()),
+				Impulse * sin(car->GetAngle()));
+#else
+		impulse.Set(-Impulse,0);
+#endif
+	}
+	return impulse;
 }
 
 static void simulat_step(int unused)
@@ -84,8 +131,15 @@ static void simulat_step(int unused)
 
 	long double deltime = (curtime.tv_sec- pretime.tv_sec) + (curtime.tv_nsec- pretime.tv_nsec)/1000000000.0;
 
-	world.Step(deltime ,1000,500);
+	/*
+	 * Simulate PWM driven Force
+	 */
 
+	car->ApplyLinearImpulse( simulate_caculate_impulse(deltime) , b2Vec2(0, 0));
+
+//	car->SetFixedRotation(1);
+
+	world.Step(deltime, 1000, 500);
 	pretime = curtime;
 }
 
