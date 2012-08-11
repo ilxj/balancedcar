@@ -192,6 +192,7 @@ static void on_key_event( int key, int, int )
 			simulate_move_extra_load(2.5);
 			break;
 		case GLUT_KEY_F12:
+			glutDestroyWindow(glutGetWindow());
 			exit(0);
 		default:
 			break;
@@ -217,4 +218,6 @@ void view_init()
 	glutMouseFunc(on_mouse_event);
 	glutSpecialFunc(on_key_event);
 	glutSpecialUpFunc(on_keyup_event);
+
+	glXSwapIntervalSGI(0);
 }

@@ -4,3 +4,7 @@
 
 void view_init();
 void view_draw_frame(b2World & world);
+
+extern "C" {
+int glXSwapIntervalSGI(unsigned int interval);
+};
