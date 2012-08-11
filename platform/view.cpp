@@ -36,6 +36,7 @@ static void 	draw_body(b2Body * body)
 	float angle = body->GetAngle() * RADTODEG;
 
 	glMatrixKeeper m;
+	glColorKeeper colorkeeper;
 
 	glTranslatef(body->GetPosition().x,body->GetPosition().y,0.0);
 	glRotated(angle,0,0,1);
@@ -83,28 +84,11 @@ static void 	draw_body(b2Body * body)
 
 static void draw_status()
 {
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0,1,0,1,-1111,99999);
-	glMatrixMode(GL_MODELVIEW);
-	glViewport(0,0,w,h);
-	glLoadIdentity();
-
-	glTranslated(0, 10, 0);
-//	glScaled(0.03, 0.03, 1);
-	{
-		glDrawString str("hello");
-	}
-
-//	glTranslated(0, -110, 0);
-	glDrawString str2("hello2");
+	glStringDrawer().printf("PWM = %d \ncar speed = %d", hal_get_pwm(), hal_get_speed() );
 }
 
 void view_draw_frame(b2World & world)
 {
-	update_glview();
-
 	glClear(GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
 	for(b2Body * body = world.GetBodyList();body;body=body->GetNext())
@@ -167,16 +151,34 @@ static void on_mouse_event(int button,int stat,int x,int y)
 	switch (button) {
 		case GLUT_WHEEL_UP_BUTTON:
 			scale *=1.5;
+			update_glview();
 			break;
 		case GLUT_WHEEL_DOWN_BUTTON:
 			scale /=1.5;
+			update_glview();
 			break;
 		default:
 			break;
 	}
 }
 
-static void on_key_event( int key, int, int )
+static void on_key_event( unsigned char key , int, int )
+{
+	static bool paused=false;
+	switch (key) {
+		case ' ':
+			paused = !paused;
+			if(paused)
+				simulate_pause();
+			else
+				simulate_resume();
+			break;
+		default:
+			break;
+	}
+}
+
+static void on_specialkey_event( int key, int, int )
 {
 	static b2Vec2 loadcentor(0,3);
 
@@ -221,6 +223,7 @@ static void on_key_event( int key, int, int )
 		default:
 			break;
 	}
+	update_glview();
 	simulate_move_extra_load(loadcentor);
 }
 
@@ -232,6 +235,7 @@ void view_init()
 	glutCreateWindow("balance");
 	glXSwapIntervalSGI(0);
 
+	glDisable(GL_DITHER);
 	glEnable (GL_BLEND);
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
@@ -243,5 +247,6 @@ void view_init()
 
 	glutReshapeFunc(on_window_resize);
 	glutMouseFunc(on_mouse_event);
-	glutSpecialFunc(on_key_event);
+	glutSpecialFunc(on_specialkey_event);
+	glutKeyboardFunc(on_key_event);
 }

@@ -8,6 +8,12 @@ void balance_init(void);
 
 void balance_iter(int interval_ms);
 
+/*
+ * if Hardware Layer decide to pause the excution of the balance_iter
+ * then call  balance_reset before resume.
+ */
+void balance_reset(void);
+
 void balance_run(void);
 
 /*

@@ -114,6 +114,20 @@ EXTERN void balance_init(void)
 
 }
 
+EXTERN void balance_reset(void)
+{
+	desired_angle =
+	desired_angle_correction =
+	desired_speed =
+	pwd =
+
+	detected_curspeed_moment =
+	detected_curspeed =
+	detected_angle_speed =
+
+	0;
+}
+
 EXTERN void balance_run(void)
 {
 	for(;;hal_delay(2))

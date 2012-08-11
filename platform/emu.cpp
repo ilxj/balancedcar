@@ -22,6 +22,7 @@ b2World	world(gravity,false);
 b2Body	*car;
 
 static int volatile	PWM;
+static bool volatile	paused=false;
 
 void simulate_move_extra_load(b2Vec2 centor)
 {
@@ -164,23 +165,36 @@ static void simulat_step(int unused)
 
 	long double deltime = (curtime.tv_sec- pretime.tv_sec) + (curtime.tv_nsec- pretime.tv_nsec)/1000000000.0;
 
-//	deltime /=1.5;
+	if(!paused){
+		/*
+		 * Simulate PWM driven Force, only if the wheel touch the ground
+		 */
+		if (simulat_car_is_grounded())
+			car->ApplyLinearImpulse(simulate_caculate_impulse(deltime),
+					b2Vec2(0, -1));
 
-	/*
-	 * Simulate PWM driven Force, only if the wheel touch the ground
-	 */
-	if( simulat_car_is_grounded() )
-		car->ApplyLinearImpulse( simulate_caculate_impulse(deltime) , b2Vec2(0, -1));
-
-	world.Step(deltime, 1000, 500);
+		world.Step(deltime, 1000, 500);
+	}
 	pretime = curtime;
 }
 
 static void balance_iter_lambda(int interval)
 {
-	glutTimerFunc(interval,balance_iter_lambda,interval);
-
+	if(!paused)
+		glutTimerFunc(interval,balance_iter_lambda,interval);
 	balance_iter(interval);
+}
+
+void simulate_pause()
+{
+	paused=true;
+}
+
+void simulate_resume()
+{
+	paused = false;
+	balance_reset();
+	glutTimerFunc(1,balance_iter_lambda,15);
 }
 
 static void emu_do_view_draw(int interval)
@@ -197,7 +211,7 @@ int main(int argc,char*argv[])
 	balance_init();
 	simulate_init();
 
-	glutTimerFunc(1,balance_iter_lambda,15);
+	simulate_resume();
 	glutTimerFunc(1,emu_do_view_draw,1000/40);
 	glutTimerFunc(1,simulat_step,0);
 
