@@ -1,10 +1,13 @@
 #include "hal.h"
 
-static int volatile	curspeed; // current speed, averaged
 static int volatile	desired_angle;
 static int volatile	desired_angle_correction;
-static int volatile	desired_speed; /*(-255~255)*/
+static int volatile	desired_speed=40; /*(-127~127)*/ // but, can't excude half of max speed, aka 127
 static int volatile	pwd; /*( -255~+255  )*/
+
+static int volatile	detected_curspeed_moment; // current speed, not averaged
+static int volatile	detected_curspeed; // current speed, averaged
+static int volatile	detected_angle_speed;
 
 /*
  * guess_gilt_angle
@@ -14,7 +17,7 @@ static int volatile	pwd; /*( -255~+255  )*/
  */
 static int guess_tilt_angle(int angle_speed,int angle_accel)
 {
-	return angle_speed + angle_accel*2;
+	return angle_speed + angle_accel*4;
 }
 
 /*
@@ -25,9 +28,10 @@ static void balance_angle()
 	int angle_speed	= hal_get_angle_speed();
 	int angle_accel = hal_get_angle_accel();
 
-	int current_speed = hal_get_speed();
+	int current_speed = detected_curspeed_moment;
 
-	int	tilt_angle	= guess_tilt_angle(angle_speed,angle_accel);
+	int	tilt_angle	= guess_tilt_angle(angle_speed,angle_accel) - desired_angle;
+	// - desired_angle;
 	/*This fir P*/
 	int angle_speed_P = (angle_speed - (desired_angle+desired_angle_correction));
 
@@ -37,15 +41,9 @@ static void balance_angle()
 	/*This fir D*/
 	int angle_speed_D = (angle_speed - (desired_angle+desired_angle_correction));
 
-	int PWM	= current_speed*12+ angle_speed *10 + tilt_angle *5 ;
-
-//	PWM /=1;
+	int PWM	= current_speed*10 + (angle_speed *60 + tilt_angle *50) /22;// + desired_angle /10 ;
 
 	hal_set_pwm(PWM);
-
-	/*record the speed*/
-	current_speed += hal_get_speed();
-	current_speed /= 2;
 }
 
 /*
@@ -53,23 +51,27 @@ static void balance_angle()
  */
 static void balance_speed()
 {
-	desired_angle = 0;
-	return ;
 	static int prespeed;
 
-	int overspeed = curspeed - desired_speed;
+	int overspeed = detected_curspeed - 50 - desired_speed * 8 ;
+	int speed_accel = (detected_curspeed_moment- prespeed)*20;
 
-	desired_angle = overspeed *20 +(curspeed - prespeed)*10 - ((curspeed - prespeed)*20+curspeed)/10;
+	desired_angle = overspeed *32 + speed_accel*32 + ((detected_curspeed_moment - prespeed)*8+detected_curspeed_moment);
 
-	desired_angle = -desired_angle / 15;
+	desired_angle = -desired_angle / 64;
 
-	prespeed=curspeed;
+	prespeed=detected_curspeed;
 
-	if(desired_angle > 100)
-		desired_angle = 100;
-	else if (desired_angle < -100)
-		desired_angle = -100;
-//	desired_angle +=100;
+	/*
+	 * Limit the angle, too big result un-recoverable
+	 */
+	if(desired_angle > 150)
+		desired_angle = 150;
+	else if (desired_angle < -150)
+		desired_angle = -150;
+
+//	hal_printf("curspeed=%d, overspeed = %d , desired_angle=%d\n",detected_curspeed_moment,overspeed,desired_angle);
+
 }
 
 /*
@@ -84,6 +86,11 @@ EXTERN void balance_iter(int interval_ms)
 {
 	static int interval=1;
 	static int long_term;
+	/*record the speed*/
+	detected_curspeed_moment = hal_get_speed();
+	detected_curspeed += detected_curspeed_moment;
+	detected_curspeed /= 2;
+
 	balance_angle();
 
 	if(interval == 0)
@@ -93,7 +100,7 @@ EXTERN void balance_iter(int interval_ms)
 		balance_speed_slow();
 
 	interval ++;
-	interval %= 18;
+	interval %= 8;
 }
 
 EXTERN void balance_init(void)
