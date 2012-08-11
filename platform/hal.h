@@ -55,6 +55,10 @@ void	hal_set_pwm(int pwm);
  */
 int hal_get_pwm();
 
+/*
+ * Useful for outputting debug info to serial
+ * But the implementation may be no-op
+ */
 int hal_printf(const char *__restrict __format, ...);
 
 #ifdef __cplusplus

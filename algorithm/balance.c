@@ -75,9 +75,6 @@ static void balance_speed()
 		desired_angle = 150;
 	else if (desired_angle < -150)
 		desired_angle = -150;
-
-//	hal_printf("curspeed=%d, overspeed = %d , desired_angle=%d\n",detected_curspeed_moment,overspeed,desired_angle);
-
 }
 
 /*
@@ -90,7 +87,7 @@ static void balance_speed_slow()
 
 EXTERN void balance_iter(int interval_ms)
 {
-	static int interval=1;
+	static int interval;
 	static int long_term;
 	/*record the speed*/
 	detected_curspeed_moment = hal_get_speed();
@@ -99,14 +96,17 @@ EXTERN void balance_iter(int interval_ms)
 
 	balance_angle();
 
-	if(interval == 0)
-		balance_speed();
-
-	if(long_term ==9)
-		balance_speed_slow();
-
 	interval ++;
 	interval %= 8;
+
+	if(interval == 0){
+		balance_speed();
+		long_term ++;
+		long_term %=16;
+
+		if(long_term ==0)
+			balance_speed_slow();
+	}
 }
 
 EXTERN void balance_reset(void)
