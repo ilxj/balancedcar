@@ -276,7 +276,10 @@ simulator::simulator()
 	PWM = 0;
 }
 
-int main(int argc, char*argv[])
+/*
+ * Start here
+ */
+int simulator::main(int argc, char*argv[])
 {
 	glutInit(&argc, argv);
 
@@ -340,3 +343,7 @@ __asm__(
 		"\t .size hal_printf, .-hal_printf"
 );
 
+int main(int argc, char*argv[])
+{
+	return simulator::main(argc,argv);
+}

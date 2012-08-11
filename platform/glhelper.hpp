@@ -20,7 +20,6 @@ public:
 };
 
 class glStringDrawer{
-	glMatrixKeeper restorer;
 	int row;
 	int line;
 	void _pos(){

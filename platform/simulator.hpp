@@ -30,6 +30,9 @@ public:
 
 	void pause();
 	void resume();
+
+	static int main(int argc,char *argv[]);
+
 private:
 	b2Vec2 car_caculate_impulse(double);
 	static void balance_iter_lambda(int interval);
