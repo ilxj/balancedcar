@@ -4,6 +4,7 @@
 #include "constant.h"
 
 #include "view.hpp"
+#include "emu.hpp"
 
 #include <unistd.h>
 #include <time.h>
@@ -22,7 +23,7 @@ b2Body	*car;
 
 static int volatile	PWM;
 
-void simulate_move_extra_load(float centor)
+void simulate_move_extra_load(b2Vec2 centor)
 {
 	static b2Fixture *extra_load;
 
@@ -36,7 +37,7 @@ void simulate_move_extra_load(float centor)
 	carfixturedef.density = 0.15f;
 	carfixturedef.friction = 2.0f;
 
-	carshape.SetAsBox(5, 0.5,b2Vec2(centor,3),0);
+	carshape.SetAsBox(5, 0.5,centor,0);
 
 	extra_load = car->CreateFixture(&carfixturedef);
 }
@@ -90,7 +91,7 @@ static void simulate_init()
 	carfixturedef.shape = & carwheel;
 	car->CreateFixture(&carfixturedef);
 
-	simulate_move_extra_load(0.0);
+	simulate_move_extra_load();
 }
 
 static float	simulate_car_wheel_speed()

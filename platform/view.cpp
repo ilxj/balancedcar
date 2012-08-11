@@ -162,18 +162,24 @@ static void on_window_resize(int _w , int _h)
 	update_glview();
 }
 
-static void on_mouse_event(int, int, int, int)
+static void on_mouse_event(int button,int stat,int x,int y)
 {
-	printf("%s\n",__func__);
-}
-
-static void on_keyup_event( int key, int, int )
-{
-	hal_set_pwm(0);
+	switch (button) {
+		case GLUT_WHEEL_UP_BUTTON:
+			scale *=1.5;
+			break;
+		case GLUT_WHEEL_DOWN_BUTTON:
+			scale /=1.5;
+			break;
+		default:
+			break;
+	}
 }
 
 static void on_key_event( int key, int, int )
 {
+	static b2Vec2 loadcentor(0,3);
+
 	switch (key)
 	{
 		case GLUT_KEY_LEFT:
@@ -183,23 +189,23 @@ static void on_key_event( int key, int, int )
 			centor -=1;
 			break;
 		case GLUT_KEY_UP:
-			scale /=2;
+			loadcentor.y++;
 			break;
 		case GLUT_KEY_DOWN:
-			scale *=2;
+			loadcentor.y--;
 			break;
 		case GLUT_KEY_F2:
-			simulate_move_extra_load(-2.5);
+			loadcentor.x --;
 			break;
 		case GLUT_KEY_F3:
-			simulate_move_extra_load(0);
+			loadcentor.x = 0;
 			break;
 		case GLUT_KEY_F4:
-			simulate_move_extra_load(2.5);
+			loadcentor.x ++;
 			break;
 		case GLUT_KEY_F12:
 			glutDestroyWindow(glutGetWindow());
-//			exit(0);
+			break;
 		case GLUT_KEY_F5:
 			balance_set_speed(50);
 			break;
@@ -209,10 +215,13 @@ static void on_key_event( int key, int, int )
 		case GLUT_KEY_F7:
 			balance_set_speed(-50);
 			break;
+		case GLUT_KEY_F11:
+			glutFullScreen();
+			break;
 		default:
 			break;
 	}
-	update_glview();
+	simulate_move_extra_load(loadcentor);
 }
 
 void view_init()
@@ -233,11 +242,6 @@ void view_init()
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glutReshapeFunc(on_window_resize);
-
-	glutFullScreen();
-
 	glutMouseFunc(on_mouse_event);
 	glutSpecialFunc(on_key_event);
-	glutSpecialUpFunc(on_keyup_event);
-
 }
