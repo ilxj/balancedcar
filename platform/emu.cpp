@@ -196,7 +196,7 @@ int main(int argc,char*argv[])
 	balance_init();
 	simulate_init();
 
-	glutTimerFunc(1,balance_iter_lambda,2);
+	glutTimerFunc(1,balance_iter_lambda,20);
 	glutTimerFunc(1,emu_do_view_draw,1000/40);
 	glutTimerFunc(1,simulat_step,0);
 

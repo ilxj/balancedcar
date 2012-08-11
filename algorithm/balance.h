@@ -11,7 +11,7 @@ void balance_iter(int interval_ms);
 void balance_run(void);
 
 /*
- * Called by remote control system
+ * Called by Hardware Layer. if it will receive remote control :)
  */
 void balance_set_speed(int speed);
 

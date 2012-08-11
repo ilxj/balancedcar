@@ -47,7 +47,7 @@ static void balance_angle()
 	/*This fir D*/
 	int angle_speed_D = (angle_speed - (desired_angle+desired_angle_correction));
 
-	int PWM	= current_speed*10 + (angle_speed *60 + tilt_angle *50) /22;// + desired_angle /10 ;
+	int PWM	= current_speed*8 + (angle_speed *60 + tilt_angle *50) /22;// + desired_angle /10 ;
 
 	hal_set_pwm(PWM);
 }

@@ -5,6 +5,7 @@
 #include "constant.h"
 #include "hal.h"
 #include "view.hpp"
+#include "balance.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -193,7 +194,16 @@ static void on_key_event( int key, int, int )
 			break;
 		case GLUT_KEY_F12:
 			glutDestroyWindow(glutGetWindow());
-			exit(0);
+//			exit(0);
+		case GLUT_KEY_F5:
+			balance_set_speed(50);
+			break;
+		case GLUT_KEY_F6:
+			balance_set_speed(0);
+			break;
+		case GLUT_KEY_F7:
+			balance_set_speed(-50);
+			break;
 		default:
 			break;
 	}
