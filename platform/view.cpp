@@ -19,6 +19,8 @@ static float scale = 40;
 static float w=800,h=600;
 static float centor;
 
+static int is_double=true;
+
 static void update_glview()
 {
 	glViewport(0,0,w,h);
@@ -145,9 +147,12 @@ void view_draw_frame(b2World & world)
 	}
 
 	//draw some debug data
-//	draw_status();
+	draw_status();
 
-	glutSwapBuffers();
+	if(is_double)
+		glutSwapBuffers();
+	else
+		glFlush();
 }
 
 static void on_window_resize(int _w , int _h)
@@ -212,7 +217,7 @@ static void on_key_event( int key, int, int )
 
 void view_init()
 {
-	glutInitDisplayMode(GLUT_DOUBLE|GLUT_MULTISAMPLE);
+	glutInitDisplayMode((is_double?GLUT_DOUBLE:GLUT_SINGLE)|GLUT_MULTISAMPLE|GLUT_ALPHA);
 
 	glutInitWindowSize(800,600);
 	glutCreateWindow("balance");
