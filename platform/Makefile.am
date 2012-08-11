@@ -5,7 +5,7 @@ bin_PROGRAMS=blance
 blance_SOURCES=hal.h
 
 if platformemu
-blance_SOURCES+=view.hpp view.cpp emu.cpp emu.hpp
+blance_SOURCES+=view.hpp view.cpp simulator.cpp simulator.hpp
 endif
 
 blance_LDADD=$(top_builddir)/algorithm/libbalance.a

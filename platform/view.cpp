@@ -9,10 +9,11 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <math.h>
 #include <GL/glut.h>
 
 #include "glhelper.hpp"
-#include "emu.hpp"
+#include "simulator.hpp"
 
 
 static float scale = 40;
@@ -87,9 +88,59 @@ static void draw_status()
 	glStringDrawer().printf("PWM = %d \ncar speed = %d", hal_get_pwm(), hal_get_speed() );
 }
 
+static void draw_pwm()
+{
+	glMatrixKeeper mk(simul.GetCar()->GetWorldPoint(b2Vec2(0,-2)));
+
+	glColorKeeper ck;
+
+	int s;
+
+	float scale=10;
+
+	glScaled(1/scale,1/scale,1);
+	glTranslatef(0,0,1);
+
+
+	s = 6;
+
+	/*
+	 * get the ground normal and rotate
+	 */
+	b2Vec2 normal = simul.get_ground_normal();
+
+	float angle = 0;
+
+	if(normal.x&&normal.y)
+		angle = atan2(normal.y,normal.x);
+
+	glRotatef(angle * RADTODEG,0,0,1);
+
+	if(hal_get_pwm()>0){
+		glScalef(-1,1,1);
+	}
+
+
+	glBegin(GL_LINES);
+
+	glColor3f(0,1,1);
+
+	glVertex2f(0,0);
+	glVertex2f(fabs(hal_get_pwm()),0);
+
+	glVertex2f(fabs(hal_get_pwm()),0);
+	glVertex2f(fabs(hal_get_pwm()) - s,s);
+
+	glVertex2f(fabs(hal_get_pwm()),0);
+	glVertex2f(fabs(hal_get_pwm()) - s,-s);
+
+	glEnd();
+
+}
+
 void view_draw_frame(b2World & world)
 {
-	glClear(GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+	glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
 	for(b2Body * body = world.GetBodyList();body;body=body->GetNext())
 	{
@@ -99,35 +150,7 @@ void view_draw_frame(b2World & world)
 	// draw arrow to reflect the PWM settings
 	if(hal_get_pwm()!=0)
 	{
-		glMatrixKeeper mk(emulation_get_car()->GetWorldPoint(b2Vec2(0,-2)));
-
-		glColorKeeper ck;
-
-		int s;
-
-		float scale=10;
-
-		s = 6;
-
-		if(hal_get_pwm()<0)
-			s = -s;
-
-		glScaled(1/scale,1/scale,1);
-
-		glBegin(GL_LINES);
-
-		glColor3f(0,1,1);
-
-		glVertex2f(0,0);
-		glVertex2f(-hal_get_pwm(),0);
-
-		glVertex2f(-hal_get_pwm(),0);
-		glVertex2f(-hal_get_pwm() + s,fabs(s));
-
-		glVertex2f(-hal_get_pwm(),0);
-		glVertex2f(-hal_get_pwm() + s,-fabs(s));
-
-		glEnd();
+		draw_pwm();
 	}
 
 	//draw some debug data
@@ -169,9 +192,9 @@ static void on_key_event( unsigned char key , int, int )
 		case ' ':
 			paused = !paused;
 			if(paused)
-				simulate_pause();
+				simul.pause();
 			else
-				simulate_resume();
+				simul.resume();
 			break;
 		default:
 			break;
@@ -224,12 +247,12 @@ static void on_specialkey_event( int key, int, int )
 			break;
 	}
 	update_glview();
-	simulate_move_extra_load(loadcentor);
+	simul.car_move_extra_load(loadcentor);
 }
 
 void view_init()
 {
-	glutInitDisplayMode((is_double?GLUT_DOUBLE:GLUT_SINGLE)|GLUT_MULTISAMPLE|GLUT_ALPHA);
+	glutInitDisplayMode((is_double?GLUT_DOUBLE:GLUT_SINGLE)|GLUT_DEPTH|GLUT_MULTISAMPLE|GLUT_ALPHA);
 
 	glutInitWindowSize(800,600);
 	glutCreateWindow("balance");
@@ -239,6 +262,8 @@ void view_init()
 	glEnable (GL_BLEND);
 	glEnable(GL_POLYGON_SMOOTH);
 	glEnable(GL_LINE_SMOOTH);
+
+	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_MULTISAMPLE);
 	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
