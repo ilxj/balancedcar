@@ -216,18 +216,23 @@ void view_init()
 
 	glutInitWindowSize(800,600);
 	glutCreateWindow("balance");
-	glutFullScreen();
+	glXSwapIntervalSGI(0);
+
+	glEnable (GL_BLEND);
+	glEnable(GL_POLYGON_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
 
 	glEnable(GL_MULTISAMPLE);
-	glMatrixMode(GL_PROJECTION);
-	gluOrtho2D(-10,10,-1,14);
-	glMatrixMode(GL_MODELVIEW);
+	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glutReshapeFunc(on_window_resize);
+
+	glutFullScreen();
 
 	glutMouseFunc(on_mouse_event);
 	glutSpecialFunc(on_key_event);
 	glutSpecialUpFunc(on_keyup_event);
 
-	glXSwapIntervalSGI(0);
 }
