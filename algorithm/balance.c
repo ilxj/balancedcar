@@ -109,11 +109,6 @@ EXTERN void balance_iter(int interval_ms)
 	interval %= 8;
 }
 
-EXTERN void balance_init(void)
-{
-
-}
-
 EXTERN void balance_reset(void)
 {
 	desired_angle =

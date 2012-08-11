@@ -281,7 +281,6 @@ int main(int argc, char*argv[])
 	glutInit(&argc, argv);
 
 	view_init();
-	balance_init();
 
 	simul.create_car();
 	simul.resume();

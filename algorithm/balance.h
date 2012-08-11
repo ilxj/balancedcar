@@ -4,8 +4,6 @@
 extern "C" {
 #endif
 
-void balance_init(void);
-
 void balance_iter(int interval_ms);
 
 /*
