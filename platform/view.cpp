@@ -14,7 +14,7 @@
 #include "emu.hpp"
 
 
-static float scale = 20;
+static float scale = 40;
 static float w=800,h=600;
 static float centor;
 
@@ -182,6 +182,17 @@ static void on_key_event( int key, int, int )
 		case GLUT_KEY_DOWN:
 			scale *=2;
 			break;
+		case GLUT_KEY_F2:
+			simulate_move_extra_load(-2.5);
+			break;
+		case GLUT_KEY_F3:
+			simulate_move_extra_load(0);
+			break;
+		case GLUT_KEY_F4:
+			simulate_move_extra_load(2.5);
+			break;
+		case GLUT_KEY_F12:
+			exit(0);
 		default:
 			break;
 	}
@@ -194,6 +205,7 @@ void view_init()
 
 	glutInitWindowSize(800,600);
 	glutCreateWindow("balance");
+	glutFullScreen();
 
 	glEnable(GL_MULTISAMPLE);
 	glMatrixMode(GL_PROJECTION);

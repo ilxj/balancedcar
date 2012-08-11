@@ -19,7 +19,27 @@
 b2Vec2	gravity(0,-9.8f);
 b2World	world(gravity,false);
 b2Body	*car;
+
 static int volatile	PWM;
+
+void simulate_move_extra_load(float centor)
+{
+	static b2Fixture *extra_load;
+
+	if(extra_load)
+		car->DestroyFixture(extra_load);
+
+	b2PolygonShape carshape;
+	b2FixtureDef   carfixturedef;
+
+	carfixturedef.shape = & carshape;
+	carfixturedef.density = 0.15f;
+	carfixturedef.friction = 2.0f;
+
+	carshape.SetAsBox(5, 0.5,b2Vec2(centor,3),0);
+
+	extra_load = car->CreateFixture(&carfixturedef);
+}
 
 static void simulate_init()
 {
@@ -48,20 +68,18 @@ static void simulate_init()
 
 	car = world.CreateBody(&cardef);
 
-
 	b2PolygonShape carshape;
 	b2FixtureDef   carfixturedef;
 
-	carshape.SetAsBox(0.5,2);
-	car->CreateFixture(&carshape,0);
-
 	carfixturedef.shape = & carshape;
-	carfixturedef.density = 0.1f;
+	carfixturedef.density = 0.01f;
 	carfixturedef.friction = 2.0f;
 
+	carshape.SetAsBox(0.5,2,b2Vec2(0,0),0);
 	car->CreateFixture(&carfixturedef);
 
-	carshape.SetAsBox(0.5,2.5,b2Vec2(0,2),0);
+	carfixturedef.density = 0.1f;
+	carshape.SetAsBox(0.5,2,b2Vec2(0,2),0);
 	car->CreateFixture(&carfixturedef);
 
 	b2CircleShape	carwheel;
@@ -71,6 +89,8 @@ static void simulate_init()
 
 	carfixturedef.shape = & carwheel;
 	car->CreateFixture(&carfixturedef);
+
+	simulate_move_extra_load(0.0);
 }
 
 static float	simulate_car_wheel_speed()

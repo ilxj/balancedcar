@@ -2,7 +2,7 @@
 
 static int volatile	desired_angle;
 static int volatile	desired_angle_correction;
-static int volatile	desired_speed=40; /*(-127~127)*/ // but, can't excude half of max speed, aka 127
+static int volatile	desired_speed; /*(-127~127)*/ // but, can't excude half of max speed, aka 127
 static int volatile	pwd; /*( -255~+255  )*/
 
 static int volatile	detected_curspeed_moment; // current speed, not averaged
@@ -29,6 +29,12 @@ static void balance_angle()
 	int angle_accel = hal_get_angle_accel();
 
 	int current_speed = detected_curspeed_moment;
+
+	if (angle_speed == 0)
+	{
+		hal_set_pwm(0);
+		return;
+	}
 
 	int	tilt_angle	= guess_tilt_angle(angle_speed,angle_accel) - desired_angle;
 	// - desired_angle;
