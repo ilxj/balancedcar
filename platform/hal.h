@@ -53,7 +53,9 @@ void	hal_set_pwm(int pwm);
  *
  * get current pwm settings
  */
-EXTERN int hal_get_pwm();
+int hal_get_pwm();
+
+int hal_printf(const char *__restrict __format, ...);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,21 @@
 #include "glhelper.hpp"
 #include "emu.hpp"
 
+
+static float scale = 20;
+static float w=800,h=600;
+static float centor;
+
+static void update_glview()
+{
+	glViewport(0,0,w,h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(-w/scale -centor ,w/scale -centor, -1,h*2/scale - 1,-1000,10000);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
 static void 	draw_body(b2Body * body)
 {
 	float angle = body->GetAngle() * RADTODEG;
@@ -63,11 +78,31 @@ static void 	draw_body(b2Body * body)
 	}
 }
 
+static void draw_status()
+{
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0,1,0,1,-1111,99999);
+	glMatrixMode(GL_MODELVIEW);
+	glViewport(0,0,w,h);
+	glLoadIdentity();
+
+	glTranslated(0, 10, 0);
+//	glScaled(0.03, 0.03, 1);
+	{
+		glDrawString str("hello");
+	}
+
+//	glTranslated(0, -110, 0);
+	glDrawString str2("hello2");
+}
+
 void view_draw_frame(b2World & world)
 {
-	glClear(GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
+	update_glview();
 
-	glLoadIdentity();
+	glClear(GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
 	for(b2Body * body = world.GetBodyList();body;body=body->GetNext())
 	{
@@ -108,22 +143,10 @@ void view_draw_frame(b2World & world)
 		glEnd();
 	}
 
+	//draw some debug data
+//	draw_status();
 
 	glutSwapBuffers();
-}
-
-static float scale = 20;
-static float w=800,h=600;
-static float centor;
-
-static void update_glview()
-{
-	printf("scale=%f\n",scale);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(-w/scale -centor ,w/scale -centor, -1,h*2/scale - 1,-1000,10000);
-	glMatrixMode(GL_MODELVIEW);
-	glViewport(0,0,w,h);
 }
 
 static void on_window_resize(int _w , int _h)
@@ -149,23 +172,20 @@ static void on_key_event( int key, int, int )
 	{
 		case GLUT_KEY_LEFT:
 			centor +=1;
-			update_glview();
 			break;
 		case GLUT_KEY_RIGHT:
 			centor -=1;
-			update_glview();
 			break;
 		case GLUT_KEY_UP:
 			scale /=2;
-			update_glview();
 			break;
 		case GLUT_KEY_DOWN:
 			scale *=2;
-			update_glview();
 			break;
 		default:
 			break;
 	}
+	update_glview();
 }
 
 void view_init()

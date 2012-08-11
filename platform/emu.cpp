@@ -61,7 +61,7 @@ static void simulate_init()
 
 	car->CreateFixture(&carfixturedef);
 
-	carshape.SetAsBox(4,0.5,b2Vec2(1.5,2),0);
+	carshape.SetAsBox(0.5,2.5,b2Vec2(0,2),0);
 	car->CreateFixture(&carfixturedef);
 
 	b2CircleShape	carwheel;
@@ -75,7 +75,17 @@ static void simulate_init()
 
 static float	simulate_car_wheel_speed()
 {
-	return - car->GetLinearVelocityFromLocalPoint(b2Vec2(0,-2)).x;
+	return - car->GetLinearVelocityFromLocalPoint(b2Vec2(0,-2)).x ;
+}
+
+static float simulat_car_is_grounded()
+{
+	b2Vec2 car_wheel = car->GetWorldPoint(b2Vec2(0, -2));
+
+	if (car_wheel.y <= 1)
+		return true;
+	else
+		return false;
 }
 
 static b2Vec2 simulate_caculate_impulse(double deltime)
@@ -136,9 +146,10 @@ static void simulat_step(int unused)
 //	deltime /=1.5;
 
 	/*
-	 * Simulate PWM driven Force
+	 * Simulate PWM driven Force, only if the wheel touch the ground
 	 */
-	car->ApplyLinearImpulse( simulate_caculate_impulse(deltime) , b2Vec2(0, -1));
+	if( simulat_car_is_grounded() )
+		car->ApplyLinearImpulse( simulate_caculate_impulse(deltime) , b2Vec2(0, -1));
 
 	world.Step(deltime, 1000, 500);
 	pretime = curtime;
@@ -165,7 +176,7 @@ int main(int argc,char*argv[])
 	balance_init();
 	simulate_init();
 
-	glutTimerFunc(5,balance_iter_lambda,5);
+	glutTimerFunc(1,balance_iter_lambda,2);
 	glutTimerFunc(1,emu_do_view_draw,1000/40);
 	glutTimerFunc(1,simulat_step,0);
 
@@ -180,13 +191,13 @@ EXTERN int hal_get_angle_speed(void)
 
 EXTERN int hal_get_angle_accel()
 {
-	return  car->GetAngularDamping() * 1000 + rand() % 10;
+	return  car->GetAngularDamping() * 1000 + rand() %5;
 }
 
 
 EXTERN int hal_get_speed()
 {
-	return simulate_car_wheel_speed()*200 + rand() % 10;
+	return simulate_car_wheel_speed() / MAX_SPEED * 1024 +rand()%5;
 }
 
 EXTERN void hal_set_pwm(int pwm)
@@ -213,3 +224,18 @@ b2Body * emulation_get_car()
 {
 	return car;
 }
+
+/*
+ * the trunk for printf
+ * int hal_printf()  :)
+ */
+__asm__(
+".globl hal_printf\n"
+".type	hal_printf,@function\n"
+"hal_printf:\n"
+"\t .cfi_startproc\n"
+"\t jmp printf\n"
+"\t .cfi_endproc\n"
+"\t .size hal_printf, .-hal_printf"
+);
+
