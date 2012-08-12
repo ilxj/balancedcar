@@ -43,17 +43,41 @@ AS_IF([ test "x$platform"="xemu"],
 	])
 	
 	dnl ----------------------
+	
+		PKG_CHECK_MODULES([FTGL],[ftgl],[
+	CPPFLAGS+=${FTGL_CFLAGS}
+	
+	AC_CHECK_LIB(c,main,[
+	
+	FTGL_LIBS="/usr/lib/libftgl.a "
+	
+	PKG_CHECK_MODULES([FT],[freetype2],[
+	
+		AC_MSG_WARN("will static link to libftgl.a")
+		
+		FTGL_LIBS+="${FT_LIBS}"
+	
+	],[])
+	
+	
+
+	],[
+	
+	AC_MSG_WARN("can't static link to libftgl.a")
+	],[-static ${FTGL_LIBS}])
+	],[ AC_MSG_FAILURE(need FTGL ,-1)   ])
+	
+	dnl ----------------------
+
 	AC_CHECK_LIB(glut,glutInit,)
 	AC_CHECK_LIB(GLU,gluOrtho2D,)
 	AC_CHECK_LIB(GL,glVertex2f,)
 
 	AC_CHECK_LIB(Box2D,main,)
-	AC_CHECK_LIB(rt,clock_gettime,)
+	AC_CHECK_LIB(rt,clock_gettime,)	
 	
-	PKG_CHECK_MODULES([FTGL],[ftgl])
+	LIBS+="${FTGL_LIBS}"	
 	
-	CPPFLAGS+=${FTGL_CFLAGS}
-	LIBS+=${FTGL_LIBS}
 ])
 
 AM_CONDITIONAL(platformemu,[ test "x$platform"="xemu"])
