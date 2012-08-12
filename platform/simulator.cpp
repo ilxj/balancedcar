@@ -37,7 +37,7 @@ void simulator::car_move_extra_load(b2Vec2 centor)
 	extra_load = car->CreateFixture(&carfixturedef);
 }
 
-void simulator::create_car()
+void simulator::init()
 {
 	b2BodyDef cardef, landdef;
 
@@ -47,7 +47,6 @@ void simulator::create_car()
 	b2Body * land = CreateBody(&landdef);
 
 	b2PolygonShape landshape;
-	landshape.SetAsBox(100, 1);
 
 	GLfloat * bgcolor = new GLfloat[3];
 
@@ -60,13 +59,7 @@ void simulator::create_car()
 	landfixturedef.shape = &landshape;
 	landfixturedef.friction = 1.0f;
 
-	land->CreateFixture(&landfixturedef)->SetUserData(bgcolor);
-
-	landshape.SetAsBox(100, 1, b2Vec2(0, 0), -1 * DEGTORAD);
-
-	land->CreateFixture(&landfixturedef)->SetUserData(bgcolor);
-
-	landshape.SetAsBox(100, 1, b2Vec2(10, 0), 1 * DEGTORAD);
+	landshape.SetAsBox(500, 1,b2Vec2_zero,0*DEGTORAD);
 
 	land->CreateFixture(&landfixturedef)->SetUserData(bgcolor);
 
@@ -216,13 +209,6 @@ void simulator::simulat_step(int unused)
 	simul.step();
 }
 
-static void emu_do_view_draw(int interval)
-{
-	view_draw_frame(simul);
-	glutTimerFunc(interval, emu_do_view_draw, interval);
-}
-
-
 void simulator::set_ground_normal(b2Fixture * fixture)
 {
 	b2PolygonShape * shape =(typeof(shape)) fixture->GetShape();
@@ -276,6 +262,12 @@ simulator::simulator()
 	PWM = 0;
 }
 
+static void emu_do_view_draw(int interval)
+{
+	view_draw_frame(simul);
+	glutTimerFunc(interval, emu_do_view_draw, interval);
+}
+
 /*
  * Start here
  */
@@ -285,7 +277,7 @@ int simulator::main(int argc, char*argv[])
 
 	view_init();
 
-	simul.create_car();
+	simul.init();
 	simul.resume();
 
 	glutTimerFunc(1, emu_do_view_draw, 1000 / 40);

@@ -19,14 +19,9 @@ public:
 	~glColorKeeper(){glColor3f(1,1,1);}
 };
 
-class glStringDrawer{
-	int row;
-	int line;
-	void _pos(){
-		glRasterPos2i(row,line+1);
-	}
+class glOrthoMode{
 public:
-	glStringDrawer():row(0),line(0){
+	glOrthoMode(){
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 
@@ -36,6 +31,25 @@ public:
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
+	}
+	virtual ~glOrthoMode(){
+		glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+	}
+};
+
+class glStringDrawer: public glOrthoMode
+{
+	int row;
+	int line;
+	void _pos(){
+		glRasterPos2i(row,line+1);
+	}
+public:
+	glStringDrawer():row(0),line(0){
+
 		_pos();
 	};
 
@@ -81,10 +95,6 @@ public:
 	}
 
 	~glStringDrawer(){
-		glPopMatrix();
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
 		glRasterPos2f(0,0);
 	}
 };

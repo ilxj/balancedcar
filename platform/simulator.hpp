@@ -23,7 +23,7 @@ private:
 	bool volatile paused;
 
 public:
-	void create_car();
+	void init();
 	void car_move_extra_load(b2Vec2 centor = b2Vec2(0,3));
 	float car_wheel_speed();
 	b2Body	*GetCar(){return car;};

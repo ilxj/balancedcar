@@ -85,7 +85,10 @@ static void 	draw_body(b2Body * body)
 
 static void draw_status()
 {
-	glStringDrawer().printf("PWM = %d \ncar speed = %d", hal_get_pwm(), hal_get_speed() );
+	glStringDrawer drawer;
+
+	drawer.printf("PWM = %d \ncar speed = %d", hal_get_pwm(), hal_get_speed() );
+
 }
 
 static void draw_pwm()
