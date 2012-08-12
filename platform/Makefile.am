@@ -1,12 +1,12 @@
 AM_CPPFLAGS=-I$(top_srcdir)/algorithm
 
-bin_PROGRAMS=blance
+bin_PROGRAMS=balance
 
-blance_SOURCES=hal.h
+balance_SOURCES=hal.h
 
 if platformemu
-blance_SOURCES+=view.hpp view.cpp simulator.cpp simulator.hpp
+balance_SOURCES+=view.hpp view.cpp simulator.cpp simulator.hpp
 endif
 
-blance_LDADD=$(top_builddir)/algorithm/libbalance.a
-blance_DEPENDENCIES=$(blance_LDADD)
+balance_LDADD=$(top_builddir)/algorithm/libbalance.a
+balance_DEPENDENCIES=$(blance_LDADD)
