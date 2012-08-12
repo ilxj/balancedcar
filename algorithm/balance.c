@@ -133,3 +133,8 @@ EXTERN void balance_set_speed(int speed)
 {
 	desired_speed = speed;
 }
+
+EXTERN int balance_get_speed(void)
+{
+	return desired_speed;
+}

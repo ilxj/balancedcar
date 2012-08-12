@@ -20,7 +20,7 @@ static float scale = 40;
 static float w=800,h=600;
 static float centor;
 
-static int is_double=true;
+static int is_double=false;
 
 static void update_glview()
 {
@@ -85,10 +85,16 @@ static void 	draw_body(b2Body * body)
 
 static void draw_status()
 {
-	glStringDrawer drawer;
+	glStringDrawer drawer(1.1);
 
-	drawer.printf("PWM = %d \ncar speed = %d", hal_get_pwm(), hal_get_speed() );
+	drawer.printf("Angle = %03.3f度\n",simul.GetCar()->GetAngle()*RADTODEG);
 
+	drawer.printf("PWM(-255~+255) = %d \n轮上车速 speed = %d\n", hal_get_pwm(), hal_get_speed() );
+
+	drawer.printf("设置的速度是:%d\n当前车速=%2.1f\n",
+			balance_get_speed(),
+			- 1024.0/20.0 * simul.GetCar()->GetLinearVelocityFromLocalPoint(b2Vec2_zero).x
+	);
 }
 
 static void draw_pwm()

@@ -49,6 +49,11 @@ AS_IF([ test "x$platform"="xemu"],
 
 	AC_CHECK_LIB(Box2D,main,)
 	AC_CHECK_LIB(rt,clock_gettime,)
+	
+	PKG_CHECK_MODULES([FTGL],[ftgl])
+	
+	CPPFLAGS+=${FTGL_CFLAGS}
+	LIBS+=${FTGL_LIBS}
 ])
 
 AM_CONDITIONAL(platformemu,[ test "x$platform"="xemu"])

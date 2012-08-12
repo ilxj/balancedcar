@@ -14,7 +14,6 @@
 #include "simulator.hpp"
 
 #define MAX_SPEED	20.0
-#define MAX_FORCE	18.0
 
 simulator simul;
 
@@ -136,7 +135,7 @@ b2Vec2 simulator::car_caculate_impulse(double deltime)
 
 		force_precent = speed_precent; //*speed_precent;
 
-		float Impulse = force_precent * MAX_FORCE * PWM / 255.0 * deltime;
+		float Impulse = force_precent * m_max_force * PWM / 255.0 * deltime;
 
 		// should set the force vector according to the ground vector
 
@@ -255,11 +254,12 @@ void simulator::EndContact(b2Contact* _contact)
 	}
 }
 
-simulator::simulator()
+simulator::simulator(int max_force)
 :b2World(b2Vec2(0, -9.8f),false)
 {
 	paused = false;
 	PWM = 0;
+	m_max_force = max_force;
 }
 
 static void emu_do_view_draw(int interval)

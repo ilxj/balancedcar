@@ -19,6 +19,11 @@ void balance_run(void);
  */
 void balance_set_speed(int speed);
 
+/*
+ * Called by Hardware Layer. if it will display on LED
+ */
+int balance_get_speed(void);
+
 #ifdef __cplusplus
 }
 #endif

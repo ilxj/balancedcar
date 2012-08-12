@@ -13,7 +13,7 @@ friend int hal_get_pwm();
 
 private: // for balance.c
 	int volatile PWM;
-
+	float m_max_force;
 private:
 	b2Body	*car;
 
@@ -52,7 +52,7 @@ private:
 	void set_ground_normal(b2Fixture * fixture);
 
 public:
-	simulator();
+	simulator(int max_force=18.0f);
 	~simulator(){}
 };
 
