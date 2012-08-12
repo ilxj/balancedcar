@@ -48,11 +48,11 @@ void simulator::init()
 
 	b2PolygonShape landshape;
 
-	GLfloat * bgcolor = new GLfloat[3];
+	b2Color * bgcolor = new b2Color;
 
-	bgcolor[0] = 0.0f;
-	bgcolor[1] = 1.0f;
-	bgcolor[2] = 0.0f;
+	bgcolor->r = 0.0f;
+	bgcolor->g = 1.0f;
+	bgcolor->b = 0.0f;
 
 	b2FixtureDef landfixturedef;
 
@@ -90,11 +90,11 @@ void simulator::init()
 
 	carfixturedef.shape = &carwheel;
 
-	bgcolor = new GLfloat[3];
+	bgcolor = new b2Color;
 
-	bgcolor[0] = 0.2f;
-	bgcolor[1] = 0.0f;
-	bgcolor[2] = 0.2f;
+	bgcolor->r = 0.2f;
+	bgcolor->g = 0.0f;
+	bgcolor->b = 0.2f;
 
 	car->CreateFixture(&carfixturedef)->SetUserData(bgcolor);
 

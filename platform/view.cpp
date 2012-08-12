@@ -37,7 +37,6 @@ static void 	draw_body(b2Body * body)
 	float angle = body->GetAngle() * RADTODEG;
 
 	glMatrixKeeper m;
-	glColorKeeper colorkeeper;
 
 	glTranslatef(body->GetPosition().x,body->GetPosition().y,0.0);
 	glRotated(angle,0,0,1);
@@ -46,11 +45,12 @@ static void 	draw_body(b2Body * body)
 	{
 		b2Shape * shape = fixtures->GetShape();
 
+		b2Color color={1,1,1};
+
 		if(fixtures->GetUserData())
-		{
-			glColor3fv(static_cast<GLfloat*>(fixtures->GetUserData()));
-		}else
-			glColor3f(1,1,1);
+			color = *(b2Color*)(fixtures->GetUserData());
+
+		glColorKeeper colorkeeper(color);
 
 		switch (shape->GetType())
 		{

@@ -15,6 +15,9 @@ public:
 class glColorKeeper{
 public:
 	glColorKeeper(){ }
+	glColorKeeper(const b2Color & color){
+		glColor3f(color.r,color.g,color.b);
+	}
 
 	~glColorKeeper(){glColor3f(1,1,1);}
 };
