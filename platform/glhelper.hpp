@@ -46,7 +46,7 @@ public:
 	}
 };
 
-class glStringDrawer: protected glOrthoMode, protected FTPolygonFont
+class glStringDrawer: protected glOrthoMode, protected FTPolygonFont , protected FTOutlineFont
 {
 private:
 	b2Color color;
@@ -80,9 +80,11 @@ private:
 public:
 	glStringDrawer(float fontsize=1,const char *fontFilePath = "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc")
 		:FTPolygonFont(fontFilePath),
+		 FTOutlineFont(fontFilePath),
 		 glOrthoMode(0,40/fontsize,30/fontsize-1,-1)
 	{
-		FaceSize(1);
+		FTOutlineFont::FaceSize(1);
+		FTPolygonFont::FaceSize(1);
 	};
 
 	void draw_str(const char * string){
@@ -100,7 +102,12 @@ public:
 
 			int c = *ready;
 			*ready = 0;
-			position = Render(str,-1,position);
+			FTPoint oldposition=position;
+
+			glColor3f(0,0,0);
+			position = FTOutlineFont::Render(str,-1,oldposition);
+			glColor3f(1,1,1);
+			position = FTPolygonFont::Render(str,-1,oldposition);
 			glPopMatrix();
 			str = ready+1;
 			if( c ){

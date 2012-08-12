@@ -5,11 +5,13 @@
 #include <Box2D/Dynamics/b2World.h>
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 
+static void emu_do_view_draw(int interval);
 
 class simulator: public b2World,public b2ContactListener
 {
 friend void hal_set_pwm(int pwm);
 friend int hal_get_pwm();
+friend void emu_do_view_draw(int interval);
 
 private: // for balance.c
 	int volatile PWM;

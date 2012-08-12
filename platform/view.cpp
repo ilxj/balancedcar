@@ -30,6 +30,7 @@ static void update_glview()
 	glOrtho(-w/scale -centor ,w/scale -centor, -1,h*2/scale - 1,-1000,10000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	glScaled(-1,1,1);
 }
 
 static void 	draw_body(b2Body * body)
@@ -144,18 +145,17 @@ static void draw_pwm()
 	glVertex2f(fabs(hal_get_pwm()) - s,-s);
 
 	glEnd();
-
 }
 
-void view_draw_frame(b2World & world)
+static void on_redraw()
 {
 	glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
-	for(b2Body * body = world.GetBodyList();body;body=body->GetNext())
+	for(b2Body * body = simul.GetBodyList();body;body=body->GetNext())
 	{
 		draw_body(body);
 	}
-	
+
 	// draw arrow to reflect the PWM settings
 	if(hal_get_pwm()!=0)
 	{
@@ -166,9 +166,9 @@ void view_draw_frame(b2World & world)
 	draw_status();
 
 	if(is_double)
-		glutSwapBuffers();
+	glutSwapBuffers();
 	else
-		glFlush();
+	glFlush();
 }
 
 static void on_window_resize(int _w , int _h)
@@ -180,6 +180,8 @@ static void on_window_resize(int _w , int _h)
 
 static void on_mouse_event(int button,int stat,int x,int y)
 {
+	glutPostRedisplay();
+
 	switch (button) {
 		case GLUT_WHEEL_UP_BUTTON:
 			scale *=1.5;
@@ -196,6 +198,8 @@ static void on_mouse_event(int button,int stat,int x,int y)
 
 static void on_key_event( unsigned char key , int, int )
 {
+	glutPostRedisplay();
+
 	static bool paused=false;
 	switch (key) {
 		case ' ':
@@ -212,6 +216,8 @@ static void on_key_event( unsigned char key , int, int )
 
 static void on_specialkey_event( int key, int, int )
 {
+	glutPostRedisplay();
+
 	static b2Vec2 loadcentor(0,3);
 
 	switch (key)
@@ -267,6 +273,7 @@ void view_init()
 	glutCreateWindow("balance");
 	glXSwapIntervalSGI(0);
 
+	glEnable(GL_MULTISAMPLE);
 	glDisable(GL_DITHER);
 	glEnable (GL_BLEND);
 	glEnable(GL_POLYGON_SMOOTH);
@@ -283,4 +290,5 @@ void view_init()
 	glutMouseFunc(on_mouse_event);
 	glutSpecialFunc(on_specialkey_event);
 	glutKeyboardFunc(on_key_event);
+	glutDisplayFunc(on_redraw);
 }

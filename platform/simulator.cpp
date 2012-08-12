@@ -182,32 +182,6 @@ void simulator::step()
 }
 
 
-void simulator::pause()
-{
-	paused = true;
-}
-
-void simulator::resume()
-{
-	paused = false;
-	balance_reset();
-	glutTimerFunc(1, balance_iter_lambda, 15);
-}
-
-void simulator::balance_iter_lambda(int interval)
-{
-	if (!simul.paused)
-		glutTimerFunc(interval, balance_iter_lambda, interval);
-	balance_iter(interval);
-}
-
-void simulator::simulat_step(int unused)
-{
-	glutTimerFunc(1, simulat_step, 0);
-
-	simul.step();
-}
-
 void simulator::set_ground_normal(b2Fixture * fixture)
 {
 	b2PolygonShape * shape =(typeof(shape)) fixture->GetShape();
@@ -262,11 +236,41 @@ simulator::simulator(int max_force)
 	m_max_force = max_force;
 }
 
+
+void simulator::pause()
+{
+	paused = true;
+}
+
+void simulator::resume()
+{
+	paused = false;
+	balance_reset();
+	glutTimerFunc(1, balance_iter_lambda, 15);
+	glutTimerFunc(1, emu_do_view_draw, 1000 / 40);
+}
+
 static void emu_do_view_draw(int interval)
 {
-	view_draw_frame(simul);
-	glutTimerFunc(interval, emu_do_view_draw, interval);
+	if(!simul.paused)
+		glutTimerFunc(interval, emu_do_view_draw, interval);
+	glutPostRedisplay();
 }
+
+void simulator::balance_iter_lambda(int interval)
+{
+	if (!simul.paused)
+		glutTimerFunc(interval, balance_iter_lambda, interval);
+	balance_iter(interval);
+}
+
+void simulator::simulat_step(int unused)
+{
+	glutTimerFunc(1, simulat_step, 0);
+
+	simul.step();
+}
+
 
 /*
  * Start here
@@ -279,8 +283,6 @@ int simulator::main(int argc, char*argv[])
 
 	simul.init();
 	simul.resume();
-
-	glutTimerFunc(1, emu_do_view_draw, 1000 / 40);
 
 	glutMainLoop();
 	return 0;
