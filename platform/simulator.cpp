@@ -99,7 +99,7 @@ void simulator::init()
 
 	SetContactListener(this);
 
-	glutTimerFunc(1, simulat_step, 0);
+	glutTimerFunc(1, simulat_step, 5);
 
 	car_move_extra_load();
 }
@@ -266,7 +266,7 @@ void simulator::balance_iter_lambda(int interval)
 
 void simulator::simulat_step(int unused)
 {
-	glutTimerFunc(1, simulat_step, 0);
+	glutTimerFunc(1, simulat_step, 5);
 
 	simul.step();
 }

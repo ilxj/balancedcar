@@ -149,6 +149,7 @@ static void draw_pwm()
 
 static void on_redraw()
 {
+//	return ;
 	glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT|GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
 	for(b2Body * body = simul.GetBodyList();body;body=body->GetNext())

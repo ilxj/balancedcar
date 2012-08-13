@@ -5,7 +5,7 @@ bin_PROGRAMS=balance
 balance_SOURCES=hal.h
 
 if platformemu
-balance_SOURCES+=view.hpp view.cpp simulator.cpp simulator.hpp
+balance_SOURCES+=view.hpp view.cpp simulator.cpp simulator.hpp hal.h glhelper.hpp
 endif
 
 balance_LDADD=$(top_builddir)/algorithm/libbalance.a
