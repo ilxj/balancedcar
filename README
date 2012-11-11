@@ -2,3 +2,22 @@ balance 是自平衡小车。
 
 利用陀螺仪测量倾角速度，使用马达移动下身进行平衡
 
+平衡算法在 algorithm/
+
+platform/ 下是模拟器。
+
+模拟器依赖 box2D , freetype2 和 ftgl。 当然， OpenGL 是必须的。
+
+ftgl 是利用freetype和OpenGL 绘制字体的库。
+
+box2D 是个物理模拟引擎。
+
+弄好依赖后，
+
+autoreconf && ./configure && make
+
+执行 ./platform/balance 看模拟效果。
+
+可以使用键盘按钮给小车施加干扰。小车受到干扰后能马上恢复平衡。
+
+ F3 F4 F6 F7 .... 自己试试看吧，呵呵。
